@@ -7,6 +7,7 @@ This repository publishes the source of Context Explorer. The marketplace catalo
 - Source code, portable command paths, built HTML, dependency declarations and repository catalog are included.
 - UI includes chronological conversation turns, segmented charts, hover/focus details, icon controls, translations and themes.
 - MIT project license and full notices for bundled third-party code are included.
+- Reviewed, privacy-safe demonstration screenshots and workflow-oriented English / Chinese introductions are included.
 - Personal session data, local preview credentials, machine paths and dependency caches are excluded.
 - The MCP server and its npm dependencies are bundled into `dist/server.mjs`; the installed plugin needs no `node_modules`. The collector uses only the Python standard library, with tiktoken optional.
 - A missing Python executable returns an explicit tool error, and a collector that exits is restarted on the next request.
@@ -17,7 +18,6 @@ This repository publishes the source of Context Explorer. The marketplace catalo
 - Decide how visible-text tokenization reaches installed copies (document optional tiktoken setup, or replace it with a bundled pure-JS tokenizer).
 - Validate clean-machine installs and supported platforms.
 - Validate native host entrypoints, panel loading, session changes, refresh and on-demand text end to end.
-- Make demonstration screenshots using clearly labeled sample data.
 - Recheck rate-table coverage and its date; keep unknown values unknown.
 
 The built UI currently has local browser coverage. That evidence does not replace native-host or cross-machine installation validation. No versioned installable release is claimed yet.

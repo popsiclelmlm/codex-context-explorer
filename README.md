@@ -1,22 +1,54 @@
-# codex-context-explorer
+# Context Explorer for Codex
 
 English · [简体中文](README.zh-CN.md)
 
-A local, read-only context explorer for Codex: inspect context usage, follow conversation turns, and browse messages and tool activity.
+**Understand what fills your context. Follow the work, turn by turn.**
 
-**Source preview.** MCP communication and the standalone report page have been checked locally. Native host UI and dependency setup inside the installed plugin cache still need end-to-end validation. This is not yet a verified one-step marketplace installation.
+Context Explorer turns local Codex session logs into an interactive report of context composition, messages, tool calls and usage. Find large outputs, retrace an agent's steps, and review a long session without digging through raw logs.
 
-## Features
+*Source preview: local MCP and browser-report checks have passed; clean-machine and native-panel validation remain in progress. [Release status](PUBLICATION.md).*
 
-- Segmented context ring and usage bar, with matching category colors.
-- Hover or focus a segment to see its share of the context window.
-- Conversation → turn → messages, tool calls and results, in original log order.
-- Session names and switching between the latest 20 main local sessions.
-- On-demand text loading, copied summaries, and refreshes while the page is visible.
-- Chinese / English and light / dark / system theme controls.
-- Recorded token totals and an API-rate cost reference, with accounting details available from the information icon.
+## What can you use it for?
 
-Visible text is counted with a local proxy tokenizer; it cannot reconstruct all hidden context. The gray region may include unseen content. The cost reference uses a dated rate table and is not a subscription bill or quota deduction.
+| When you want to… | Context Explorer helps you… |
+| --- | --- |
+| Understand what occupies the context window | See instructions, rules, skills, tools and conversation in a colored ring and usage bar; hover or focus a category to inspect its share. |
+| Review how an agent approached a task | Follow messages, tool calls and results within each conversation turn, in their original order. |
+| Investigate repeated calls or large tool outputs | Open the relevant entry, inspect retained text and its token count, and see the surrounding steps. |
+| Revisit another task | Switch between the latest 20 named main sessions without searching log files. |
+| Understand recorded usage | Review cumulative tokens, request counts and an API-rate cost reference alongside the session. |
+| Keep a report open while working | Use automatic refresh, on-demand text and copied summaries, with English / Chinese and light / dark / system themes. |
+
+Page refreshes and entry expansion read local data directly; they do not trigger an extra model response. The collector does not modify or compact your conversations.
+
+## See it in action
+
+All screenshots below use **synthetic demonstration data**, including session text, project names, token counts and the cost reference. They show the browser report, not a verified native-host installation.
+
+### Find where context goes
+
+The overview puts context composition, category shares and session usage together. Move over a segment to isolate the category you want to inspect.
+
+![English dark theme with Skills highlighted](docs/screenshots/hover-en-dark.png)
+
+### Follow the conversation, then inspect the evidence
+
+Expand a turn to review what was requested, which tools ran and what they returned. Open an individual result when you need its retained text.
+
+![Conversation turns, tool calls and an expanded result](docs/screenshots/conversation-zh-light.png)
+
+<details>
+<summary>Chinese light-theme overview</summary>
+
+![Chinese light-theme context overview](docs/screenshots/overview-zh-light.png)
+
+</details>
+
+## What the numbers mean
+
+Category counts use a local tokenizer over visible log text. Hidden instructions, images and encrypted reasoning are not fully represented, and gray space may include unseen content. Switch the chart basis to inspect the latest request recorded in the log.
+
+Only the latest 500 text fragments retain expandable text; each displays up to 8,000 characters. Unrecoverable original turns in compacted history are labeled. The dated API-rate reference is not a subscription bill or quota deduction.
 
 ## Repository layout
 
@@ -66,7 +98,7 @@ codex plugin add context-explorer@codex-context-explorer
 
 The collector reads local Codex logs and session-name metadata. It does not include a developer upload endpoint or telemetry. Tool summaries and on-demand panel data are processed by the Codex host under its data policies.
 
-No personal logs, live preview keys, screenshots of real sessions, machine-specific runtime paths, or dependency caches are included. Commit identity checks use GitHub `noreply` addresses; see [CONTRIBUTING.md](CONTRIBUTING.md).
+The included screenshots use synthetic data. No personal logs, live preview keys, screenshots of real sessions, machine-specific runtime paths, or dependency caches are included. Commit identity checks use GitHub `noreply` addresses; see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
