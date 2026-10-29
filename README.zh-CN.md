@@ -19,6 +19,8 @@ codex plugin add context-explorer@codex-context-explorer
 
 `context-explorer@codex-context-explorer` 的格式是"插件名@市场名"。装完后如果找不到插件，确认插件已启用，然后重启桌面端。
 
+更新：先执行 `codex plugin marketplace upgrade codex-context-explorer`，再执行一次上面的 `codex plugin add` 命令，然后重启桌面端。
+
 ## 使用
 
 在 Codex 的本地聊天里发送：

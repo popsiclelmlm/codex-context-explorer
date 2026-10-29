@@ -19,6 +19,8 @@ codex plugin add context-explorer@codex-context-explorer
 
 `context-explorer@codex-context-explorer` means plugin `context-explorer` from marketplace `codex-context-explorer`. If the plugin doesn't show up afterwards, make sure it is enabled and restart the desktop app.
 
+To update, run `codex plugin marketplace upgrade codex-context-explorer`, then the `codex plugin add` command above again, and restart the desktop app.
+
 ## Use
 
 In a local Codex chat, send:
