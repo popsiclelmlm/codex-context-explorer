@@ -6,11 +6,11 @@ See what fills your Codex context window, right in the sidebar, and step through
 
 ![Context overview in the dark theme](docs/screenshots/hover-en-dark.png)
 
-> **Status: early preview.** Works in the Codex desktop app on macOS. Installing from GitHub on a clean machine is not yet verified, and Windows is untested. See [PUBLICATION.md](PUBLICATION.md).
+> **Status: early preview.** Works in the Codex desktop app on macOS, and installing from GitHub has been tested on a clean macOS setup. Linux and Windows are untested. See [PUBLICATION.md](PUBLICATION.md).
 
 ## Install
 
-Requires Node.js 22+ and Python 3.10+.
+Requires Node.js 22+ and Python 3.9+ (the Python that ships with macOS works).
 
 ```sh
 codex plugin marketplace add popsiclelmlm/codex-context-explorer --ref main

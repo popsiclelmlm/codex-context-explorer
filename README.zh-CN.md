@@ -6,11 +6,11 @@
 
 ![中文浅色主题的上下文总览](docs/screenshots/overview-zh-light.png)
 
-> **状态：早期预览。** 已在 macOS 的 Codex 桌面端可用；在全新机器上从 GitHub 安装尚未验证，Windows 未测试。详见 [PUBLICATION.md](PUBLICATION.md)。
+> **状态：早期预览。** 已在 macOS 的 Codex 桌面端可用，并在全新的 macOS 环境中测试过从 GitHub 安装；Linux 和 Windows 未测试。详见 [PUBLICATION.md](PUBLICATION.md)。
 
 ## 安装
 
-需要 Node.js 22+ 和 Python 3.10+。
+需要 Node.js 22+ 和 Python 3.9+（macOS 自带的 Python 即可）。
 
 ```sh
 codex plugin marketplace add popsiclelmlm/codex-context-explorer --ref main

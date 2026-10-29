@@ -12,7 +12,7 @@ The repository marketplace is live, but no versioned release has been tagged yet
 ## Before tagging v0.1.0
 
 - Token estimates in installed copies: document the optional tiktoken setup, or switch to a bundled pure-JS tokenizer.
-- Install from GitHub on a clean machine and recheck the panel there: open, switch sessions, refresh, expand entries.
+- Recheck the panel after a GitHub install in the desktop app: open, switch sessions, refresh, expand entries. (A clean CLI install from GitHub and the installed copy's MCP server were verified on a second Mac with Node 22/26 and Python 3.9/3.14.)
 - Test Windows, or state that only macOS and Linux are supported.
 - Recheck the price table and its date.
 
