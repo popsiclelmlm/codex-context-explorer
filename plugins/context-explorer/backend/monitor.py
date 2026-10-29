@@ -28,11 +28,15 @@ class Breakdown:
     """Tokenize visible text only; never infer a hidden category from a residual."""
     encoder = None
     attempted = False
+    # 宿主注入的批量计数函数 list[str] -> list[int]；设置后优先于 tiktoken，计数延后到 flush()。
+    external = None
+    pending = []
+    BATCH_CHARACTERS = 1_000_000
 
     def __init__(self):
         self.buckets = {key: {'tokens': 0, 'items': 0} for key, _, _ in CATEGORIES}
         self.hidden_items = 0
-        if not Breakdown.attempted:
+        if not Breakdown.attempted and Breakdown.external is None:
             Breakdown.attempted = True
             try:
                 sys.path.insert(0, str(ROOT / 'vendor'))
@@ -52,12 +56,43 @@ class Breakdown:
             except (ImportError, OSError, ValueError):
                 pass
 
-    def add(self, category, text):
+    @staticmethod
+    def counting():
+        return Breakdown.external is not None or Breakdown.encoder is not None
+
+    @staticmethod
+    def count(text, targets):
+        """把 text 的 token 数累加到每个 (dict, key) 上；外部计数时先登记，flush() 时补齐。"""
+        if Breakdown.external is not None:
+            Breakdown.pending.append((text, targets))
+        elif Breakdown.encoder is not None:
+            tokens = len(Breakdown.encoder.encode(text, disallowed_special=()))
+            for target, key in targets:
+                target[key] += tokens
+
+    @staticmethod
+    def flush():
+        pending, Breakdown.pending = Breakdown.pending, []
+        start = 0
+        while start < len(pending):
+            end, size = start, 0
+            while end < len(pending) and (end == start or size + len(pending[end][0]) <= Breakdown.BATCH_CHARACTERS):
+                size += len(pending[end][0])
+                end += 1
+            batch = pending[start:end]
+            counts = Breakdown.external([text for text, _ in batch])
+            if len(counts) != len(batch):
+                raise ValueError('Token counter returned a mismatched batch')
+            for (_, targets), tokens in zip(batch, counts):
+                for target, key in targets:
+                    target[key] += tokens
+            start = end
+
+    def add(self, category, text, *targets):
         if not isinstance(text, str) or not text.strip():
             return
-        if self.encoder is not None:
-            self.buckets[category]['tokens'] += len(self.encoder.encode(text, disallowed_special=()))
         self.buckets[category]['items'] += 1
+        self.count(text, [(self.buckets[category], 'tokens'), *targets])
 
     def message(self, text, role):
         default = 'system_prompt' if role in ('system', 'developer') else 'messages'
@@ -105,7 +140,7 @@ class Breakdown:
                 self.hidden_items += 1
 
     def snapshot(self):
-        available = self.encoder is not None
+        available = self.counting()
         total = sum(b['tokens'] for b in self.buckets.values()) if available else None
         rows = []
         for key, label, color in CATEGORIES:
@@ -276,6 +311,12 @@ class SessionReader:
                         self.malformed += 1
                 except (ValueError, UnicodeError):
                     self.malformed += 1
+        try:
+            Breakdown.flush()
+        except Exception:
+            # 已读过的文本没能计数，下次从头重读，避免总数悄悄偏小。
+            self.identity = None
+            raise
 
     def snapshot(self):
         usage = self.usage

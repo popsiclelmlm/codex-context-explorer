@@ -3,6 +3,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server';
 import { OpenAIUiToolMetadataSchema } from '@openai/mcp-extensions/server';
 import { z } from 'zod';
+import { countTokens } from 'gpt-tokenizer/encoding/o200k_base';
 import { spawn } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -15,6 +16,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = existsSync(join(here, 'bridge.py')) ? here : dirname(here);
 const venvPython = join(root, '.venv', process.platform === 'win32' ? 'Scripts' : 'bin', process.platform === 'win32' ? 'python.exe' : 'python');
 const python = process.env.CONTEXT_EXPLORER_PYTHON || (existsSync(venvPython) ? venvPython : process.platform === 'win32' ? 'python' : 'python3');
+// 与 tiktoken 的 disallowed_special=() 一致：日志里出现的特殊标记按普通文本计数，而不是报错。
+const plainText = { disallowedSpecial: new Set() };
 let sequence = 0, worker = null, closing = false;
 const pending = new Map();
 function failPending(message) {
@@ -23,7 +26,9 @@ function failPending(message) {
 }
 // 采集器异常退出后不自动重启，下一次请求时再拉起，避免 Python 缺失时反复空转。
 function startWorker() {
-  const child = spawn(python, [join(root, 'bridge.py')], { stdio: ['pipe', 'pipe', 'inherit'] });
+  // 分词由本进程用打包的 o200k_base 完成，安装后的插件无需 tiktoken。
+  const child = spawn(python, [join(root, 'bridge.py')], { stdio: ['pipe', 'pipe', 'inherit'],
+    env: { ...process.env, CONTEXT_EXPLORER_TOKENIZER: 'host' } });
   const stopped = message => { if (worker === child) worker = null; failPending(message); };
   child.on('error', error => {
     const message = error.code === 'ENOENT'
@@ -38,6 +43,13 @@ function startWorker() {
   createInterface({ input: child.stdout }).on('line', line => {
     let reply;
     try { reply = JSON.parse(line); } catch { return; }
+    if ('tokenize' in reply) {
+      let tokens = null;
+      try { tokens = reply.texts.map(text => countTokens(text, plainText)); }
+      catch (error) { console.error('[context-explorer] Token counting failed: ' + error.message); }
+      child.stdin.write(JSON.stringify({ tokens_for: reply.tokenize, tokens }) + '\n');
+      return;
+    }
     const request = pending.get(reply.id);
     if (!request) return;
     clearTimeout(request.timer); pending.delete(reply.id);

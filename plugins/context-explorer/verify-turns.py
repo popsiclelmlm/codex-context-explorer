@@ -1,6 +1,11 @@
 """Check chronology, explicit turn boundaries, call labels, retention and compaction."""
 from pathlib import Path
 from bridge import ExplorerReader, CONVERSATION
+import monitor
+
+# 用确定性的假计数器走「宿主批量计数」路径；小批量强制分多批，覆盖分批与回填。
+monitor.Breakdown.external = lambda texts: [len(t.split()) for t in texts]
+monitor.Breakdown.BATCH_CHARACTERS = 50
 
 def record(reader, typ, payload):
     reader.consume({'type': typ, 'timestamp': '2026-10-29T00:00:00Z', 'payload': payload})
@@ -33,9 +38,22 @@ assert '原轮次未知' in next(iter(r.breakdown.turns.values()))['label']
 record(r,'response_item',msg('assistant','after compact'))
 assert list(r.breakdown.entries)[-1]['turn_id']=='two'
 assert r.breakdown.turns['two']['items']==1
-if r.breakdown.encoder:
-    total=sum(row['tokens'] or 0 for row in r.breakdown.snapshot()['rows'] if row['id'] in CONVERSATION)
-    assert total==sum(t['tokens'] for t in r.breakdown.turns.values())
+monitor.Breakdown.flush()
+total=sum(row['tokens'] or 0 for row in r.breakdown.snapshot()['rows'] if row['id'] in CONVERSATION)
+assert total==sum(t['tokens'] for t in r.breakdown.turns.values())==4
+assert [e['tokens'] for e in list(r.breakdown.entries)[-1:]]==[2]
+assert r.breakdown.snapshot()['tokenizer']=='o200k_base (proxy)'
+# 计数失败时整份会话下次重读，不留下偏小的总数。
+import tempfile as _t, json as _j
+with _t.TemporaryDirectory() as d:
+    log=Path(d,'rollout.jsonl');log.write_text(_j.dumps({'type':'response_item','payload':msg('user','a b c')})+'\n')
+    reader=ExplorerReader(log);good=monitor.Breakdown.external
+    def broken(texts): raise EOFError('host gone')
+    monitor.Breakdown.external=broken
+    try: reader.update(); raise AssertionError('flush failure should propagate')
+    except EOFError: pass
+    monitor.Breakdown.external=good;reader.update()
+    assert reader.breakdown.buckets['messages']=={'tokens':3,'items':1}
 fallback=ExplorerReader(Path('/tmp/context-explorer-fallback'))
 for text in ['a','b']:record(fallback,'response_item',msg('user',text))
 assert fallback.turn_number==2
@@ -50,5 +68,4 @@ with tempfile.TemporaryDirectory() as home:
     finally:
         time.monotonic=real
     assert [s for s,_ in m.paths]==['demo']
-token_status = 'token totals checked' if r.breakdown.encoder else 'token totals skipped (tokenizer/cache unavailable)'
-print('PASS: chronology; native and inferred turns; matched tool results; retention; compaction; ' + token_status + '.')
+print('PASS: chronology; native and inferred turns; matched tool results; retention; compaction; batched token totals; recount after counter failure.')

@@ -1,5 +1,6 @@
 """Read local session reports. UI text remains outside model-visible tool results."""
 import json
+import os
 import sqlite3
 from pathlib import Path
 import sys
@@ -28,20 +29,24 @@ class ExplorerBreakdown(core.Breakdown):
         self.item_kind = 'context'
 
     def add(self, category, text):
-        before = self.buckets[category]['tokens']
-        super().add(category, text)
         if not isinstance(text, str) or not text.strip():
             return
         self.serial += 1
+        counting = self.counting()
+        targets = []
         if category in CONVERSATION:
-            turn = self.turns.setdefault(self.turn['id'], {**self.turn, 'items': 0, 'tokens': 0 if self.encoder else None})
+            turn = self.turns.setdefault(self.turn['id'], {**self.turn, 'items': 0, 'tokens': 0 if counting else None})
             turn['items'] += 1
-            if self.encoder:
-                turn['tokens'] += self.buckets[category]['tokens'] - before
-        self.entries.append({'turn_id': self.turn['id'], 'kind': self.item_kind, 'sequence': self.record_index, 'id': f'{self.record_index}:{self.serial}',
+            if counting:
+                targets.append((turn, 'tokens'))
+        entry = {'turn_id': self.turn['id'], 'kind': self.item_kind, 'sequence': self.record_index, 'id': f'{self.record_index}:{self.serial}',
             'category': category, 'label': self.label, 'timestamp': self.timestamp,
-            'tokens': self.buckets[category]['tokens'] - before if self.encoder else None,
-            'characters': len(text), 'text': text[:8000], 'truncated': len(text) > 8000})
+            'tokens': 0 if counting else None,
+            'characters': len(text), 'text': text[:8000], 'truncated': len(text) > 8000}
+        if counting:
+            targets.append((entry, 'tokens'))
+        self.entries.append(entry)
+        super().add(category, text, *targets)
 
 
     def item(self, item):
@@ -199,9 +204,35 @@ class Explorer:
                 'checked_at': core.now()}
 
 
+backlog = deque()
+token_sequence = 0
+
+
+def host_counter(texts):
+    """请宿主（server.mjs）用打包的 o200k_base 分词；等待期间到达的普通请求先排队。"""
+    global token_sequence
+    token_sequence += 1
+    print(json.dumps({'tokenize': token_sequence, 'texts': texts}, ensure_ascii=False), flush=True)
+    while True:
+        line = sys.stdin.readline()
+        if not line:
+            raise EOFError('Host closed the collector input')
+        message = json.loads(line)
+        if message.get('tokens_for') == token_sequence:
+            if not isinstance(message.get('tokens'), list):
+                raise ValueError('Host could not count tokens')
+            return message['tokens']
+        backlog.append(line)
+
+
 if __name__ == '__main__':
+    if os.environ.get('CONTEXT_EXPLORER_TOKENIZER') == 'host':
+        core.Breakdown.external = host_counter
     explorer = Explorer()
-    for line in sys.stdin:
+    while True:
+        line = backlog.popleft() if backlog else sys.stdin.readline()
+        if not line:
+            break
         request = None
         try:
             request = json.loads(line)
