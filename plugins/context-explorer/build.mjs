@@ -8,11 +8,13 @@ await writeFile('dist/report.html', template.replace('/* APP_CODE */', () => res
 const server = await build({ entryPoints: ['server.mjs'], bundle: true, metafile: true, outfile: 'dist/server.mjs', platform: 'node', format: 'esm', target: 'node22', minify: true, legalComments: 'eof' });
 
 // 两个产物实际打包进去的 npm 包都随插件分发，逐一附上其许可证原文。
+// node_modules 可能是符号链接，输入路径未必以 node_modules/ 开头，因此取路径中最后一段包名。
 const packages = new Set();
 for (const input of [...Object.keys(result.metafile.inputs), ...Object.keys(server.metafile.inputs)]) {
-  const match = input.match(/^node_modules\/((?:@[^/]+\/)?[^/]+)\//);
+  const match = [...input.matchAll(/(?:^|\/)node_modules\/((?:@[^/]+\/)?[^/]+)\//g)].at(-1);
   if (match) packages.add(match[1]);
 }
+if (!packages.size) throw new Error('No bundled npm packages found; refusing to write empty license notices');
 const notices = [];
 for (const name of [...packages].sort()) {
   const dir = `node_modules/${name}`;
