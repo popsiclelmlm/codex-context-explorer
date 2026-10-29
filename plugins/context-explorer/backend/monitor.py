@@ -313,11 +313,12 @@ class Monitor:
     def __init__(self, sessions):
         self.sessions = sessions
         self.paths = []
-        self.last_discovery = 0
+        # monotonic() 的起点因平台和版本而异（macOS 上的 Python 3.9 从进程启动约 0 秒算起），首次必须扫描。
+        self.last_discovery = None
         self.readers = {}
 
     def discover(self):
-        if time.monotonic() - self.last_discovery < 5:
+        if self.last_discovery is not None and time.monotonic() - self.last_discovery < 5:
             return
         candidates = []
         for path in self.sessions.glob('*/*/*/rollout-*.jsonl'):

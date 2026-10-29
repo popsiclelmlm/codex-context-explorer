@@ -39,5 +39,16 @@ if r.breakdown.encoder:
 fallback=ExplorerReader(Path('/tmp/context-explorer-fallback'))
 for text in ['a','b']:record(fallback,'response_item',msg('user',text))
 assert fallback.turn_number==2
+# 首次扫描不能被节流：模拟 monotonic() 从进程启动约 0 秒起算的平台（如 macOS 上的 Python 3.9）。
+import json, tempfile, time, monitor
+with tempfile.TemporaryDirectory() as home:
+    day=Path(home,'2026','10','29');day.mkdir(parents=True)
+    Path(day,'rollout-demo.jsonl').write_text(json.dumps({'type':'session_meta','payload':{'id':'demo','source':'cli'}})+'\n')
+    real=time.monotonic;time.monotonic=lambda:0.01
+    try:
+        m=monitor.Monitor(Path(home));m.discover()
+    finally:
+        time.monotonic=real
+    assert [s for s,_ in m.paths]==['demo']
 token_status = 'token totals checked' if r.breakdown.encoder else 'token totals skipped (tokenizer/cache unavailable)'
 print('PASS: chronology; native and inferred turns; matched tool results; retention; compaction; ' + token_status + '.')
