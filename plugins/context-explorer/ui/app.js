@@ -231,9 +231,20 @@ async function refresh() {
     const result = await call('refresh_context_report', selected ? { session_id: selected } : {});
     if (selected !== requested) return;
     if (result.isError || !result._meta?.report) throw Error('读取失败');
-    render(result._meta.report); showError(null);
-  } catch { showError('refreshError'); }
+    render(result._meta.report); showError(null); savedSnapshot = null;
+  } catch {
+    if (!report && savedSnapshot) { render(savedSnapshot); showError('staleSnapshot'); }
+    else showError('refreshError');
+  }
   finally { busy = false; }
+}
+// Codex 会把模型调用工具时的结果存进对话历史，重开对话时原样重放；过旧的快照不当作当前数据，只在刷新失败时兜底。
+const SNAPSHOT_MAX_AGE_MS = 30000;
+let savedSnapshot = null;
+function receiveToolResult(value) {
+  const age = Date.now() - Date.parse(value.checked_at);
+  if (age <= SNAPSHOT_MAX_AGE_MS) { render(value); return; }
+  savedSnapshot = value; refresh();
 }
 $('sessions').addEventListener('change', () => { selected = $('sessions').value; opened.clear(); itemCache.clear(); activeChartPart=null;refresh(); });
 $('refresh').addEventListener('click', refresh);
@@ -256,7 +267,9 @@ $('copy').addEventListener('click', async () => {
   const text=t('copyHeader',{name:report.session_name||selected,id:selected,model:s.model||t('unknown'),used:count(s.used_tokens),capacity:count(s.window_tokens)})+'\n'+s.breakdown.rows.map(r=>`${label(r.id)}: ${count(r.tokens)}`).join('\n');
   try { await navigator.clipboard.writeText(text);copied=true;$('copy').textContent=t('copied'); } catch { showError('clipboardError'); }
 });
-app.ontoolresult = params => { if (params._meta?.report) render(params._meta.report); };
+app.ontoolresult = params => { if (params._meta?.report) receiveToolResult(params._meta.report); };
+// 面板在后台加载时首次刷新会被跳过，变为可见时立即补上，而不是等下一个 5 秒周期。
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 app.onhostcontextchanged=ctx=>setHostTheme(ctx.theme);
 staticText();applyTheme();
 if (!window.__CONTEXT_EXPLORER_PREVIEW__) {

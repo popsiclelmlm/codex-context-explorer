@@ -29,7 +29,7 @@ const text = {
   costUnknown:["API 参考费用：未知","API-rate reference: unknown"],
   cost:["API 参考费用 ${usd} USD","API-rate reference ${usd} USD"],
   coverageFull:['已记录用量覆盖完整','all recorded usage covered'], coveragePartial:['仅已定价部分','priced usage only'],
-  refreshError:['无法读取本地采集器，请检查插件连接后重试。','Cannot read the local collector. Check the plugin connection and retry.'], hostError:['请从 Context Explorer 插件入口打开此面板。','Open this panel from the Context Explorer plugin.'], clipboardError:['浏览器未提供剪贴板权限。','Clipboard access is not available.'],
+  refreshError:['无法读取本地采集器，请检查插件连接后重试。','Cannot read the local collector. Check the plugin connection and retry.'], staleSnapshot:['无法刷新，当前显示的是之前保存的快照。','Cannot refresh; showing a previously saved snapshot.'], hostError:['请从 Context Explorer 插件入口打开此面板。','Open this panel from the Context Explorer plugin.'], clipboardError:['浏览器未提供剪贴板权限。','Clipboard access is not available.'],
   copyHeader:["会话 {name}\nID {id}\n模型 {model}\n最近请求 {used} / {capacity} tokens\n可见文本（本地分词）：","Session {name}\nID {id}\nModel {model}\nLatest request {used} / {capacity} tokens\nVisible text (local tokenization):"],
 };
 function saved(key,fallback) { try { return localStorage.getItem('context-explorer-'+key) || fallback; } catch { return fallback; } }
