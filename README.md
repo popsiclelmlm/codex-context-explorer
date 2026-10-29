@@ -43,8 +43,7 @@ Screenshots use synthetic data.
 
 ## About the numbers
 
-- Category sizes come from tokenizing the visible log text locally with `o200k_base`. Hidden instructions, images and encrypted reasoning can't be counted, so the gray part of the chart may include content you can't see.
-- Token estimates need the optional `tiktoken` package and its cache (see [Development](#development)). Without them the estimates show as unknown; recorded request usage still works.
+- Category sizes come from tokenizing the visible log text locally with `o200k_base` (bundled, no setup needed). Hidden instructions, images and encrypted reasoning can't be counted, so the gray part of the chart may include content you can't see.
 - Only the latest 500 text fragments keep their text, up to 8,000 characters each.
 - The cost is an API-rate reference, not your subscription bill.
 
@@ -57,22 +56,19 @@ git clone https://github.com/popsiclelmlm/codex-context-explorer.git
 python3 codex-context-explorer/plugins/context-explorer/preview.py
 ```
 
-Open the printed `127.0.0.1` URL; `Ctrl+C` stops the server. The URL contains an access key, so don't share it.
+Open the printed `127.0.0.1` URL; `Ctrl+C` stops the server. The URL contains an access key, so don't share it. This page runs without Node, so token estimates need the optional `tiktoken` package and its cache (`requirements.txt`); otherwise they show as unknown.
 
 ## Development
 
 ```sh
 cd plugins/context-explorer
 npm ci
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-TIKTOKEN_CACHE_DIR=backend/tokenizer-cache .venv/bin/python -c "import tiktoken; tiktoken.get_encoding('o200k_base')"
 npm run build
-.venv/bin/python verify-turns.py
+python3 verify-turns.py
 npm run verify:mcp   # reads your most recent local session
 ```
 
-`npm run build` bundles the MCP server and its npm dependencies into `dist/server.mjs` and the UI into `dist/report.html`, so installed copies don't need `node_modules`. Commit `dist/` after changing `server.mjs` or `ui/`. The Python collector uses only the standard library; set `CONTEXT_EXPLORER_PYTHON` to choose a specific interpreter.
+`npm run build` bundles the MCP server, its npm dependencies and the `o200k_base` tokenizer into `dist/server.mjs` and the UI into `dist/report.html`, so installed copies don't need `node_modules` or tiktoken. Commit `dist/` after changing `server.mjs` or `ui/`. The Python collector uses only the standard library; set `CONTEXT_EXPLORER_PYTHON` to choose a specific interpreter.
 
 ```text
 .agents/plugins/marketplace.json   marketplace catalog

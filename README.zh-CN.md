@@ -43,8 +43,7 @@ codex plugin add context-explorer@codex-context-explorer
 
 ## 关于数据
 
-- 类别大小由本地 `o200k_base` 分词统计日志中的可见文本得出。隐藏指令、图片和加密推理无法计入，所以图中灰色部分可能包含看不到的内容。
-- token 估算需要可选的 `tiktoken` 及其词表缓存（见[开发](#开发)）；缺少时显示为未知，日志记录的请求用量不受影响。
+- 类别大小由本地 `o200k_base` 分词统计日志中的可见文本得出（分词器已内置，无需安装）。隐藏指令、图片和加密推理无法计入，所以图中灰色部分可能包含看不到的内容。
 - 只保留最近 500 个文本片段的正文，每段最多 8000 字符。
 - 费用是按 API 单价算的参考值，不是订阅账单。
 
@@ -57,22 +56,19 @@ git clone https://github.com/popsiclelmlm/codex-context-explorer.git
 python3 codex-context-explorer/plugins/context-explorer/preview.py
 ```
 
-打开终端打印的 `127.0.0.1` 网址，按 `Ctrl+C` 停止。网址里带访问密钥，不要分享。
+打开终端打印的 `127.0.0.1` 网址，按 `Ctrl+C` 停止。网址里带访问密钥，不要分享。这个网页不经过 Node，token 估算需要可选的 `tiktoken` 及其词表缓存（`requirements.txt`），否则显示为未知。
 
 ## 开发
 
 ```sh
 cd plugins/context-explorer
 npm ci
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-TIKTOKEN_CACHE_DIR=backend/tokenizer-cache .venv/bin/python -c "import tiktoken; tiktoken.get_encoding('o200k_base')"
 npm run build
-.venv/bin/python verify-turns.py
+python3 verify-turns.py
 npm run verify:mcp   # 读取本机最近一个会话
 ```
 
-`npm run build` 把 MCP 服务端连同 npm 依赖打包成 `dist/server.mjs`，界面打包成 `dist/report.html`，安装后的插件不需要 `node_modules`。修改 `server.mjs` 或 `ui/` 后要重新构建并提交 `dist/`。Python 采集器只用标准库；可用 `CONTEXT_EXPLORER_PYTHON` 指定解释器。
+`npm run build` 把 MCP 服务端连同 npm 依赖和 `o200k_base` 分词器打包成 `dist/server.mjs`，界面打包成 `dist/report.html`，安装后的插件不需要 `node_modules`，也不需要 tiktoken。修改 `server.mjs` 或 `ui/` 后要重新构建并提交 `dist/`。Python 采集器只用标准库；可用 `CONTEXT_EXPLORER_PYTHON` 指定解释器。
 
 ```text
 .agents/plugins/marketplace.json   插件市场清单

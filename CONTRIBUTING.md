@@ -4,11 +4,12 @@ This is a source preview. Keep native-host and install-validation claims separat
 
 ## Local checks
 
-Inside `plugins/context-explorer`, prepare the dependencies described in the README, then run:
+Inside `plugins/context-explorer`, run:
 
 ```sh
+npm ci
 npm run build
-.venv/bin/python verify-turns.py
+python3 verify-turns.py
 npm run verify:mcp
 ```
 
