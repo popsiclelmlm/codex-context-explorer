@@ -50,6 +50,33 @@ Category counts use a local tokenizer over visible log text. Hidden instructions
 
 Only the latest 500 text fragments retain expandable text; each displays up to 8,000 characters. Unrecoverable original turns in compacted history are labeled. The dated API-rate reference is not a subscription bill or quota deduction.
 
+## How to use it after installation
+
+1. Confirm that the plugin is installed and enabled in the Codex desktop app, with Node.js 22+ and Python 3 available to its runtime.
+2. **Start a new local chat**, type `@`, select **Context Explorer**, then ask:
+
+   > Open the context report.
+
+3. Check the session name before inspecting the report. It defaults to the most recently active main session, which may differ from the current chat. You can select among the latest 20 main sessions.
+4. Hover or focus the ring or legend to inspect a category. Expand **Conversation → Turn → Entry** to read messages, tool calls and retained results.
+5. Use the top-right icons for language, theme and accounting details. The report refreshes every five seconds while visible; manual refresh, expansion and copied summaries are also available.
+
+**Native-panel validation is still in progress.** If a new chat has no tool entry, check that the plugin is enabled, then fully quit and reopen the desktop app. A successful tool call alone does not confirm that the host can display the panel.
+
+### Use the browser report
+
+The browser report can run independently. Clone `main` and start it from a terminal:
+
+```sh
+git clone --branch main https://github.com/popsiclelmlm/codex-context-explorer.git
+cd codex-context-explorer
+python3 plugins/context-explorer/preview.py
+```
+
+Open the loopback URL printed by the process. Keep the terminal running; press `Ctrl+C` to stop it. This mode reads real local logs, so keep its URL key and screenshots of personal conversations private.
+
+The browser report runs with the Python standard library and the committed HTML; no npm build is required. Visible-text tokenization additionally needs optional tiktoken and its cache. Without them, those counts remain unknown while recorded request usage remains readable. See **Local development** below for setup. The source checkout and installed plugin cache are separate locations; tokenizer setup must be available to the copy that actually runs.
+
 ## Repository layout
 
 ```text
@@ -88,7 +115,7 @@ For a standalone development report, run `.venv/bin/python preview.py` inside th
 The catalog name is `codex-context-explorer`; the plugin name is `context-explorer`. The repository can be registered as a marketplace source:
 
 ```sh
-codex plugin marketplace add popsiclelmlm/codex-context-explorer
+codex plugin marketplace add popsiclelmlm/codex-context-explorer --ref main
 codex plugin add context-explorer@codex-context-explorer
 ```
 

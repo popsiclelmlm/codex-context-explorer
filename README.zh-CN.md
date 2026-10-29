@@ -50,6 +50,33 @@ Context Explorer 把本地 Codex 会话日志整理成可交互的报告，让�
 
 最近 500 个片段可展开，单条正文最多显示 8000 字符；压缩后无法恢复的原轮次会单独标注。API 参考费用使用带核价日期的单价表，不代表订阅账单或实际额度扣减。详细统计口径可从界面右上角的信息图标打开。
 
+## 安装后如何使用
+
+1. 在 Codex 桌面端确认插件已安装并启用；Node.js 22+ 和 Python 3 必须能在插件运行环境中启动。
+2. **新开一个本地聊天**，在输入框输入 `@` 并选择 **Context Explorer**，然后发送：
+
+   > 打开上下文报告。
+
+3. 面板打开后，先核对顶部会话名称；默认选择最近活动的主会话，可切换最近 20 个主会话，未必自动对应当前聊天。
+4. 悬停或聚焦环形图 / 图例查看类别占比；展开“对话记录 → 轮次 → 条目”，回看消息、工具调用和结果正文。
+5. 右上角图标用于切换语言、主题和查看统计口径。页面可见时每 5 秒刷新，也可手动刷新、展开全部或复制摘要。
+
+**原生面板仍在验证中。** 如果新聊天中没有工具入口，先检查插件是否启用，再完全退出并重开桌面端后重试。已能调用工具但面板不显示，不应视为安装已经通过验收。
+
+### 使用浏览器报告
+
+当前可独立使用浏览器报告。先克隆 `main` 分支，在终端执行：
+
+```sh
+git clone --branch main https://github.com/popsiclelmlm/codex-context-explorer.git
+cd codex-context-explorer
+python3 plugins/context-explorer/preview.py
+```
+
+打开终端打印的 `http://127.0.0.1:.../?key=...` 网址。终端需保持运行，按 `Ctrl+C` 停止。此方式读取本机真实日志；不要把带 key 的网址或真实会话截图公开分享。
+
+浏览器报告使用 Python 标准库即可启动，不需要先执行 npm 构建。可见文本分词另需准备可选的 tiktoken 与词表；未准备时该部分显示未知，日志记录的请求用量仍可读取。分词准备步骤见下方“本地准备”。桌面插件缓存和源码目录是不同位置，分词依赖需位于实际运行的副本中。
+
 ## 目录
 
 ```text
@@ -86,10 +113,10 @@ npm run build
 
 ## 安装仓库市场
 
-在本项目根目录执行：
+从 GitHub 添加市场（使用 main 分支）：
 
 ```sh
-codex plugin marketplace add .
+codex plugin marketplace add popsiclelmlm/codex-context-explorer --ref main
 codex plugin add context-explorer@codex-context-explorer
 ```
 
