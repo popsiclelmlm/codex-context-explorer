@@ -26,7 +26,7 @@ plugins/context-explorer/        Plugin source and built UI
   ui/                           UI, charts, translations, SVG icons
   backend/                      Local log and usage readers
   server.mjs / bridge.py         MCP server and Python bridge
-  dist/                         Built HTML resource
+  dist/                         Built single-file MCP server, HTML resource and license notices
 ```
 
 ## Local development
@@ -45,7 +45,9 @@ npm run build
 
 Dependency installation and the initial tokenizer cache download require a network connection. The running collector never downloads a tokenizer automatically. Without a cache, visible-text token counts remain unknown.
 
-The server prefers the plugin-local `.venv`; `CONTEXT_EXPLORER_PYTHON` can override its Python executable. Otherwise it uses Python from `PATH`. Windows installation has not been verified.
+`npm run build` bundles the MCP server and its npm dependencies into `dist/server.mjs`, so an installed plugin needs no `node_modules`; rebuild and commit `dist/` after changing `server.mjs` or `ui/`. At runtime the plugin needs only Node.js 22+ and Python 3: the collector uses the standard library, and tiktoken is optional.
+
+The server prefers the plugin-local `.venv`; `CONTEXT_EXPLORER_PYTHON` can override its Python executable. Otherwise it uses Python from `PATH`. If Python cannot be started, tool calls return an explicit error; if the collector exits, the next request restarts it. Windows installation has not been verified.
 
 For a standalone development report, run `.venv/bin/python preview.py` inside the plugin directory and open its printed loopback URL. This is a development preview, not proof of native host integration.
 
@@ -58,7 +60,7 @@ codex plugin marketplace add popsiclelmlm/codex-context-explorer
 codex plugin add context-explorer@codex-context-explorer
 ```
 
-**Installation is still in development.** A copied plugin cache needs its own Node/Python dependencies and tokenizer cache. Completing local setup in the checkout alone does not guarantee that the installed cache can run. See [PUBLICATION.md](PUBLICATION.md) for remaining work.
+**Installation is still being validated.** The installed plugin cache runs without `node_modules` or a virtual environment, but visible-text token estimates stay unknown unless tiktoken and its `o200k_base` cache are prepared in that cache. Clean-machine and native-panel validation are still pending; see [PUBLICATION.md](PUBLICATION.md).
 
 ## Privacy
 
@@ -68,4 +70,4 @@ No personal logs, live preview keys, screenshots of real sessions, machine-speci
 
 ## License
 
-Project-authored code is licensed under [MIT](LICENSE). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for bundled dependencies and Lucide icons.
+Project-authored code is licensed under [MIT](LICENSE). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for bundled dependencies and Lucide icons; the build also writes every dependency bundled into `dist/` to `plugins/context-explorer/dist/THIRD_PARTY_LICENSES.txt`.
