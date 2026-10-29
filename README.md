@@ -2,23 +2,11 @@
 
 English · [简体中文](README.zh-CN.md)
 
-A local, read-only Codex plugin that shows what fills your context window and lets you step through a session turn by turn: messages, tool calls and their results.
+See what fills your Codex context window, right in the sidebar, and step through the session turn by turn: messages, tool calls and their results.
 
 ![Context overview in the dark theme](docs/screenshots/hover-en-dark.png)
 
-> **Status: early preview.** The MCP server and the browser report work on macOS. The native Codex panel and clean-machine installs are not verified yet, and Windows is untested. See [PUBLICATION.md](PUBLICATION.md).
-
-## Features
-
-- Context breakdown by category: system prompt, tools/MCP, rules, skills, subagents and conversation.
-- Conversation → turn → messages, tool calls and results, in log order. Text loads only when you expand an entry.
-- Switch between the 20 most recent main sessions.
-- Session token totals and an API-rate cost reference.
-- English and Chinese; light, dark and system themes. Refreshes every 5 seconds while visible, without calling the model.
-
-![Conversation turns with an expanded tool result](docs/screenshots/conversation-zh-light.png)
-
-Screenshots use synthetic data.
+> **Status: early preview.** Works in the Codex desktop app on macOS. Installing from GitHub on a clean machine is not yet verified, and Windows is untested. See [PUBLICATION.md](PUBLICATION.md).
 
 ## Install
 
@@ -29,20 +17,29 @@ codex plugin marketplace add popsiclelmlm/codex-context-explorer --ref main
 codex plugin add context-explorer@codex-context-explorer
 ```
 
-Start a new local chat, type `@`, pick **Context Explorer** and ask it to open the context report. The report opens on the most recently active session, which may not be the current chat; check the name at the top.
+`context-explorer@codex-context-explorer` means plugin `context-explorer` from marketplace `codex-context-explorer`. If the plugin doesn't show up afterwards, make sure it is enabled and restart the desktop app.
 
-If the plugin doesn't appear under `@`, make sure it is enabled and restart the desktop app.
+## Use
 
-## Browser report
+In a local Codex chat, send:
 
-To use the report without installing the plugin:
-
-```sh
-git clone https://github.com/popsiclelmlm/codex-context-explorer.git
-python3 codex-context-explorer/plugins/context-explorer/preview.py
+```text
+@Context Explorer open the context report
 ```
 
-Open the printed `127.0.0.1` URL; `Ctrl+C` stops the server. It shows your real sessions and the URL contains an access key, so don't share it.
+The report opens in the sidebar browser and shows the context usage of the most recently active session, which is normally the chat you are in. It refreshes every 5 seconds while visible, without calling the model. To look at another session, pick it from the menu at the top.
+
+## Features
+
+- Context breakdown by category: system prompt, tools/MCP, rules, skills, subagents and conversation.
+- Conversation → turn → messages, tool calls and results, in log order. Text loads only when you expand an entry.
+- Switch between the 20 most recent main sessions.
+- Session token totals and an API-rate cost reference.
+- English and Chinese; light, dark and system themes.
+
+![Conversation turns with an expanded tool result](docs/screenshots/conversation-zh-light.png)
+
+Screenshots use synthetic data.
 
 ## About the numbers
 
@@ -50,6 +47,17 @@ Open the printed `127.0.0.1` URL; `Ctrl+C` stops the server. It shows your real 
 - Token estimates need the optional `tiktoken` package and its cache (see [Development](#development)). Without them the estimates show as unknown; recorded request usage still works.
 - Only the latest 500 text fragments keep their text, up to 8,000 characters each.
 - The cost is an API-rate reference, not your subscription bill.
+
+## Without the plugin
+
+The same report can run as a local web page:
+
+```sh
+git clone https://github.com/popsiclelmlm/codex-context-explorer.git
+python3 codex-context-explorer/plugins/context-explorer/preview.py
+```
+
+Open the printed `127.0.0.1` URL; `Ctrl+C` stops the server. The URL contains an access key, so don't share it.
 
 ## Development
 

@@ -2,23 +2,11 @@
 
 [English](README.md) · 简体中文
 
-一个本地只读的 Codex 插件：看清上下文窗口被什么占用，并按轮次回看会话里的消息、工具调用和结果。
+在 Codex 侧边栏直接查看当前会话的上下文占用，并按轮次回看消息、工具调用和结果。
 
 ![中文浅色主题的上下文总览](docs/screenshots/overview-zh-light.png)
 
-> **状态：早期预览。** MCP 服务端和浏览器报告已在 macOS 上可用；原生 Codex 面板和全新机器安装尚未验证，Windows 未测试。详见 [PUBLICATION.md](PUBLICATION.md)。
-
-## 功能
-
-- 按类别拆分上下文：系统提示词、工具 / MCP、项目规则、技能、子代理和对话。
-- 对话 → 轮次 → 消息、工具调用、结果，按日志顺序排列；展开条目时才读取正文。
-- 切换最近 20 个主会话。
-- 会话累计 token 和 API 价格参考费用。
-- 中英文界面，浅色 / 深色 / 跟随系统主题。页面可见时每 5 秒刷新，不调用模型。
-
-![会话轮次与展开的工具结果](docs/screenshots/conversation-zh-light.png)
-
-截图均为合成数据。
+> **状态：早期预览。** 已在 macOS 的 Codex 桌面端可用；在全新机器上从 GitHub 安装尚未验证，Windows 未测试。详见 [PUBLICATION.md](PUBLICATION.md)。
 
 ## 安装
 
@@ -29,20 +17,29 @@ codex plugin marketplace add popsiclelmlm/codex-context-explorer --ref main
 codex plugin add context-explorer@codex-context-explorer
 ```
 
-新开一个本地聊天，输入 `@` 选择 **Context Explorer**，让它打开上下文报告。报告默认显示最近活动的会话，不一定是当前聊天，请先看顶部的会话名称。
+`context-explorer@codex-context-explorer` 的格式是"插件名@市场名"。装完后如果找不到插件，确认插件已启用，然后重启桌面端。
 
-如果 `@` 里没有这个插件，确认插件已启用，然后重启桌面端。
+## 使用
 
-## 浏览器报告
+在 Codex 的本地聊天里发送：
 
-不安装插件也能直接看报告：
-
-```sh
-git clone https://github.com/popsiclelmlm/codex-context-explorer.git
-python3 codex-context-explorer/plugins/context-explorer/preview.py
+```text
+@Context Explorer 打开上下文报告
 ```
 
-打开终端打印的 `127.0.0.1` 网址，按 `Ctrl+C` 停止。页面显示的是你的真实会话，网址里带访问密钥，不要分享。
+报告会在侧边内置浏览器中打开，显示最近活动会话的上下文占用，通常就是你正在用的这个聊天。页面可见时每 5 秒自动刷新，不调用模型。要看其他会话，从顶部的下拉框切换。
+
+## 功能
+
+- 按类别拆分上下文：系统提示词、工具 / MCP、项目规则、技能、子代理和对话。
+- 对话 → 轮次 → 消息、工具调用、结果，按日志顺序排列；展开条目时才读取正文。
+- 切换最近 20 个主会话。
+- 会话累计 token 和 API 价格参考费用。
+- 中英文界面，浅色 / 深色 / 跟随系统主题。
+
+![会话轮次与展开的工具结果](docs/screenshots/conversation-zh-light.png)
+
+截图均为合成数据。
 
 ## 关于数据
 
@@ -50,6 +47,17 @@ python3 codex-context-explorer/plugins/context-explorer/preview.py
 - token 估算需要可选的 `tiktoken` 及其词表缓存（见[开发](#开发)）；缺少时显示为未知，日志记录的请求用量不受影响。
 - 只保留最近 500 个文本片段的正文，每段最多 8000 字符。
 - 费用是按 API 单价算的参考值，不是订阅账单。
+
+## 不安装插件
+
+同一份报告也可以作为本地网页运行：
+
+```sh
+git clone https://github.com/popsiclelmlm/codex-context-explorer.git
+python3 codex-context-explorer/plugins/context-explorer/preview.py
+```
+
+打开终端打印的 `127.0.0.1` 网址，按 `Ctrl+C` 停止。网址里带访问密钥，不要分享。
 
 ## 开发
 
