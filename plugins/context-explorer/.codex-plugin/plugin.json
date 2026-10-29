@@ -1,0 +1,36 @@
+{
+  "name": "context-explorer",
+  "version": "0.1.0",
+  "description": "Explore local Codex context usage, follow messages and tool activity by turn, and inspect recorded token usage.",
+  "requires_local_executor": true,
+  "interface": {
+    "displayName": "Context Explorer",
+    "shortDescription": "按轮次查看 Codex 上下文与会话用量",
+    "longDescription": "Context Explorer 为 Codex 桌面端提供可展开的本地会话报告，帮助你了解上下文占用、追踪会话中的工具调用，并查看已记录的 token 用量。\n\n• 占用概览：显示日志中最近一次请求的 token 快照与上下文窗口大小。\n• 会话时间线：Conversation 按 Turn 分组，依次展示用户消息、助手回复、工具调用与结果，支持展开正文。\n• 上下文组成：查看可见系统指令、项目规则、Skills 目录、工具说明与代理指令的文本估算。\n• 会话切换：显示真实会话名称，支持切换最近 20 个本地主会话；默认选择最近活动的会话。\n• 轻量刷新：页面可见时每 5 秒刷新；页面内刷新、展开和复制摘要不发起新的模型回答。\n• 用量参考：展示会话累计 tokens，以及价格表已覆盖请求的 API 等价费用估算。\n\n需要支持本地执行的桌面会话。分类根据可见日志文本估算，无法完整还原隐藏系统内容、图片或加密推理。压缩后无法恢复的原轮次会单独标注。正文仅保留最近 500 个文本片段，每个片段最多显示 8000 字符。费用估算会显示核价日期和覆盖情况，不代表订阅账单或额度扣减。\n\n插件不内置开发者数据接收服务或遥测；工具用量摘要和按需读取的报告数据由 Codex 宿主处理。",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "defaultPrompt": [
+      "打开本地上下文报告，查看最近活动会话。",
+      "按轮次查看会话中的消息、工具调用和结果。",
+      "查看会话累计 token 用量和 API 等价费用估算。"
+    ]
+  },
+  "mcpServers": "./.mcp.json",
+  "keywords": [
+    "codex",
+    "context",
+    "tokens",
+    "usage",
+    "conversation",
+    "local"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "popsiclelmlm",
+    "url": "https://github.com/popsiclelmlm"
+  },
+  "repository": "https://github.com/popsiclelmlm/codex-context-explorer",
+  "homepage": "https://github.com/popsiclelmlm/codex-context-explorer"
+}

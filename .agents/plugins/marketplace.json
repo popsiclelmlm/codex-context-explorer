@@ -1,0 +1,20 @@
+{
+  "name": "codex-context-explorer",
+  "interface": {
+    "displayName": "Context Explorer"
+  },
+  "plugins": [
+    {
+      "name": "context-explorer",
+      "source": {
+        "source": "local",
+        "path": "./plugins/context-explorer"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

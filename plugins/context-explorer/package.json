@@ -1,0 +1,26 @@
+{
+  "devDependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.7.5",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@openai/mcp-extensions": "^0.2.1",
+    "esbuild": "^0.28.2",
+    "zod": "^4.6.7"
+  },
+  "name": "context-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "verify:mcp": "node verify.mjs"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "popsiclelmlm",
+    "url": "https://github.com/popsiclelmlm"
+  },
+  "repository": "https://github.com/popsiclelmlm/codex-context-explorer"
+}

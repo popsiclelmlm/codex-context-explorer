@@ -1,0 +1,14 @@
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+.env.*
+!.env.example
+**/backend/vendor/
+**/backend/tokenizer-cache/
+**/state/
+**/verification.json
+*.log
+runtime-config.json

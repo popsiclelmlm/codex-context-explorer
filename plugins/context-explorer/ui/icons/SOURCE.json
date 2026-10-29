@@ -1,0 +1,24 @@
+{
+  "library": "Lucide",
+  "repository": "https://github.com/lucide-icons/lucide",
+  "commit": "be09619c1c1124ad09c19fc3e87ee3b939409bbd",
+  "icons": [
+    "server",
+    "list-checks",
+    "zap",
+    "bot",
+    "message-circle",
+    "messages-square",
+    "message-square",
+    "wrench",
+    "file-output",
+    "brain",
+    "archive",
+    "chevron-right",
+    "languages",
+    "sun",
+    "moon",
+    "monitor",
+    "info"
+  ]
+}
