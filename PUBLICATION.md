@@ -1,29 +1,21 @@
-# Repository marketplace roadmap
+# Release status
 
-This repository publishes the source of Context Explorer. The marketplace catalog is available, but publication of source is not a claim that a fresh plugin installation already works without setup.
+The repository marketplace is live, but no versioned release has been tagged yet.
 
-## Current scope
+## Done
 
-- Source code, portable command paths, built HTML, dependency declarations and repository catalog are included.
-- UI includes chronological conversation turns, segmented charts, hover/focus details, icon controls, translations and themes.
-- MIT project license and full notices for bundled third-party code are included.
-- Reviewed, privacy-safe demonstration screenshots and workflow-oriented English / Chinese introductions are included.
-- Personal session data, local preview credentials, machine paths and dependency caches are excluded.
-- The MCP server and its npm dependencies are bundled into `dist/server.mjs`; the installed plugin needs no `node_modules`. The collector uses only the Python standard library, with tiktoken optional.
-- A missing Python executable returns an explicit tool error, and a collector that exits is restarted on the next request.
-- Unused standalone web server, hook receipt and account rate-limit code (which launched `codex app-server`) has been removed.
+- The MCP server and its npm dependencies are bundled into `dist/server.mjs`; installed copies need no `node_modules`.
+- The Python collector uses only the standard library. A missing Python returns a clear tool error, and a crashed collector restarts on the next request.
+- MIT license, third-party notices and synthetic-data screenshots are included.
+- The MCP server and browser report have been tested on macOS against real local sessions.
 
-## Before an installable marketplace release
+## Before tagging v0.1.0
 
-- Decide how visible-text tokenization reaches installed copies (document optional tiktoken setup, or replace it with a bundled pure-JS tokenizer).
-- Validate clean-machine installs and supported platforms.
-- Validate native host entrypoints, panel loading, session changes, refresh and on-demand text end to end.
-- Recheck rate-table coverage and its date; keep unknown values unknown.
+- Token estimates in installed copies: document the optional tiktoken setup, or switch to a bundled pure-JS tokenizer.
+- Install from GitHub on a clean machine and confirm the native panel: open, switch sessions, refresh, expand entries.
+- Test Windows, or state that only macOS and Linux are supported.
+- Recheck the price table and its date.
 
-The built UI currently has local browser coverage. That evidence does not replace native-host or cross-machine installation validation. No versioned installable release is claimed yet.
+## OpenAI plugin directory
 
-## OpenAI public directory
-
-Publishing a GitHub-hosted repository marketplace is separate from submission to the OpenAI public directory. Local MCP submissions to that directory currently require an eligible, allowlisted publisher organization and the usual publisher materials.
-
-References: [Repository catalogs](https://developers.openai.com/plugins/build/plugins), [desktop-only submission](https://developers.openai.com/plugins/deploy/desktop-only).
+Not planned for now. Local MCP plugins can only be submitted by allowlisted publisher organizations. See [repository marketplaces](https://developers.openai.com/plugins/build/plugins) and [desktop-only submission](https://developers.openai.com/plugins/deploy/desktop-only).
